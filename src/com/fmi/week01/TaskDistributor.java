@@ -1,22 +1,19 @@
 package com.fmi.week01;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 public class TaskDistributor {
     public static int minDifference(int[] tasks){
+        int bestSubset = 0 , remainingSubset = 0, totalTime = 0;
 
         if(tasks.length == 0){ // 3 edge cases for now
             return 0;
         } else if(tasks.length == 1){
             return tasks[0];
         } else if(tasks.length == 2){
-            return tasks[0] > tasks[1] ? tasks[0] - tasks[1]: tasks[1]- tasks[0];
+            return Math.abs(bestSubset - remainingSubset);
         }
 
-        int totalTime = 0;
         for (int task : tasks){
-            totalTime+= task;
+            totalTime += task;
         }
 
         int halfTime = totalTime /2;
@@ -31,15 +28,15 @@ public class TaskDistributor {
                 }
             }
         }
-        int team1 = 0 , team2=0;
+
         for(int i = dp.length - 1; i >= 0; i--){
             if(dp[i]){
-               team1 = i;
+               bestSubset = i;
                break;
             }
         }
-        team2 = totalTime - team1;
-        return Math.abs(team1 - team2);
+        remainingSubset = totalTime - bestSubset;
+        return Math.abs(bestSubset - remainingSubset);
 
     }
 
