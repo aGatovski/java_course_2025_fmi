@@ -4,7 +4,7 @@ import bg.sofia.uni.fmi.mjt.show.date.DateEvent;
 
 /**
  * Represents an ergenka participating in the show.
- *
+ * <p>
  * Implementations must provide the ergenka's basic attributes (name, age)
  * and performance metrics (romance, humor, rating). The {@link #reactToDate(DateEvent)}
  * method allows an ergenka to update her internal state when participating in a {@link DateEvent}.

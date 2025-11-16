@@ -2,7 +2,7 @@ package bg.sofia.uni.fmi.mjt.show.ergenka;
 
 import bg.sofia.uni.fmi.mjt.show.date.DateEvent;
 
-public class RomanticErgenka implements Ergenka{
+public class RomanticErgenka implements Ergenka {
     private final String name;
     private final short age;
     private final int romanceLevel;
@@ -10,7 +10,7 @@ public class RomanticErgenka implements Ergenka{
     private int rating;
     private final String favoriteDateLocation;
 
-    public RomanticErgenka(String name, short age, int romanceLevel, int humorLevel, int rating, String favoriteDateLocation){
+    public RomanticErgenka(String name, short age, int romanceLevel, int humorLevel, int rating, String favoriteDateLocation) {
         this.name = name;
         this.age = age;
         this.romanceLevel = romanceLevel;
@@ -51,16 +51,16 @@ public class RomanticErgenka implements Ergenka{
         int dateDuration = dateEvent.getDuration();
         int dateTension = dateEvent.getTensionLevel();
 
-        if(comparison == 0){
+        if (comparison == 0) {
             bonuses += 5;
         }
 
-        if(dateDuration < 30){
+        if (dateDuration < 30) {
             bonuses -= 3;
-        } else if( dateDuration > 90){
+        } else if (dateDuration > 90) {
             bonuses -= 2;
         }
 
-        rating = (romanceLevel*7) / dateTension + (int) Math.floor((double) humorLevel / 3) + bonuses;
+        rating = (romanceLevel * 7) / dateTension + (int) Math.floor((double) humorLevel / 3) + bonuses;
     }
 }

@@ -6,6 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/Labs/01/TaskDistributor/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Labs/01/UniqueSubstringFinder/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Labs/02" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Labs/03" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />

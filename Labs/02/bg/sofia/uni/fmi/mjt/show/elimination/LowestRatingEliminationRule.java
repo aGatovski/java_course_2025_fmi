@@ -9,20 +9,20 @@ public class LowestRatingEliminationRule implements EliminationRule {
         int lowestRating = Integer.MAX_VALUE;
         int[] ratings = new int[ergenkas.length];
 
-        for (int i = 0; i < ratings.length ; i++ ){
+        for (int i = 0; i < ratings.length; i++) {
             ratings[i] = ergenkas[i].getRating();
         }
 
-        for (int rat : ratings){
-            if(rat < lowestRating){
+        for (int rat : ratings) {
+            if (rat < lowestRating) {
                 lowestRating = rat;
             }
         }
 
         int counter = 0;
 
-        for (Ergenka erg : ergenkas){
-            if(erg.getRating() > lowestRating){
+        for (Ergenka erg : ergenkas) {
+            if (erg.getRating() > lowestRating) {
                 afterEliminationErgenkas[counter++] = erg;
             }
         }

@@ -33,7 +33,7 @@ public interface ShowAPI {
     /**
      * Performs a single date with the ergenkas {@link DateEvent}.
      *
-     * @param ergenka the ergenka participating in the date, never {@code null}
+     * @param ergenka   the ergenka participating in the date, never {@code null}
      * @param dateEvent the date event to organize, never {@code null}
      */
     void organizeDate(Ergenka ergenka, DateEvent dateEvent);

@@ -2,14 +2,14 @@ package bg.sofia.uni.fmi.mjt.show.ergenka;
 
 import bg.sofia.uni.fmi.mjt.show.date.DateEvent;
 
-public class HumorousErgenka implements Ergenka{
+public class HumorousErgenka implements Ergenka {
     private final String name;
     private final short age;
     private final int romanceLevel;
     private final int humorLevel;
     private int rating;
 
-    public HumorousErgenka(String name, short age, int romanceLevel, int humorLevel, int rating){
+    public HumorousErgenka(String name, short age, int romanceLevel, int humorLevel, int rating) {
         this.name = name;
         this.age = age;
         this.romanceLevel = romanceLevel;
@@ -47,14 +47,14 @@ public class HumorousErgenka implements Ergenka{
         int bonuses = 0;
         int dateDuration = dateEvent.getDuration();
         int dateTensionLevel = dateEvent.getTensionLevel();
-        if(dateDuration >= 30 && dateDuration <= 90){
+        if (dateDuration >= 30 && dateDuration <= 90) {
             bonuses = 4;
-        } else if(dateDuration < 30){
+        } else if (dateDuration < 30) {
             bonuses = -2;
         } else {
             bonuses = -3;
         }
 
-        rating = (humorLevel*5) / dateTensionLevel + (int) Math.floor((double) romanceLevel /3) + bonuses; // Math.floor връща double?
+        rating = (humorLevel * 5) / dateTensionLevel + (int) Math.floor((double) romanceLevel / 3) + bonuses; // Math.floor връща double?
     }
 }
