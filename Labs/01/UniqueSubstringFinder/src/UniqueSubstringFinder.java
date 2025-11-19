@@ -27,6 +27,7 @@ public class UniqueSubstringFinder {
 
         return s.substring(maxStart, maxEnd);
     }
+
 };
 
 

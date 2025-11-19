@@ -6,8 +6,6 @@ public class TaskDistributor {
             return 0;
         } else if (tasks.length == 1) {
             return tasks[0];
-        } else if (tasks.length == 2) {
-            return Math.abs(bestSubset - remainingSubset);
         }
 
         for (int task : tasks) {
@@ -21,7 +19,7 @@ public class TaskDistributor {
         for (int task : tasks) {
             if (task > halfTime) continue;
             for (int i = halfTime; i >= task; i--) {
-                if (dp[i - task]) { // ако dp[i - task] е true това означава че dp[i] ще е true защото е достижимо чрез dp[i - task] + task
+                if (dp[i - task]) {
                     dp[i] = true;
                 }
             }
