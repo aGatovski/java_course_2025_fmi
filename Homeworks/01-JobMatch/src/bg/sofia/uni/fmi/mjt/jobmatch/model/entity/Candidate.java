@@ -1,5 +1,6 @@
 package bg.sofia.uni.fmi.mjt.jobmatch.model.entity;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Candidate {
@@ -26,7 +27,7 @@ public class Candidate {
     }
 
     public Set<Skill> getSkills() {
-        return skills;
+        return new HashSet<>(skills);
     }
 
     public Education getEducation() {
@@ -46,7 +47,6 @@ public class Candidate {
     }
 
     private void setEmail(String email) {
-        //раздели двете проверки
         if (email == null || email.isBlank()) {
             throw new IllegalArgumentException("Email cannot be null or blank");
         }
@@ -59,7 +59,7 @@ public class Candidate {
             throw new IllegalArgumentException("Skills cannot be null or empty");
         }
 
-        this.skills = skills;
+        this.skills = new HashSet<>(skills);
     }
 
     private void setEducation(Education education) {

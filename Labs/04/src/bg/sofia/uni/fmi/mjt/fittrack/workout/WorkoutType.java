@@ -1,4 +1,5 @@
 package bg.sofia.uni.fmi.mjt.fittrack.workout;
 
-public class WorkoutType {
+public enum WorkoutType {
+    CARDIO, STRENGTH, YOGA
 }

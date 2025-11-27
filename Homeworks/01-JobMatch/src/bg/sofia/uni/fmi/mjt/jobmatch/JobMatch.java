@@ -4,10 +4,8 @@ import bg.sofia.uni.fmi.mjt.jobmatch.api.JobMatchAPI;
 import bg.sofia.uni.fmi.mjt.jobmatch.exceptions.CandidateNotFoundException;
 import bg.sofia.uni.fmi.mjt.jobmatch.exceptions.JobPostingNotFoundException;
 import bg.sofia.uni.fmi.mjt.jobmatch.exceptions.UserAlreadyExistsException;
+import bg.sofia.uni.fmi.mjt.jobmatch.exceptions.UserNotFoundException;
 import bg.sofia.uni.fmi.mjt.jobmatch.matching.CosineSimilarity;
-import bg.sofia.uni.fmi.mjt.jobmatch.matching.SimilarityScoreFirstCandidateNameSecondDescJobMatchComparator;
-import bg.sofia.uni.fmi.mjt.jobmatch.matching.SimilarityScoreFirstCandidateNameSecondDescSimilarityMatchComparator;
-import bg.sofia.uni.fmi.mjt.jobmatch.matching.SimilarityScoreFirstJobTitleSecondDescJobMatchComparator;
 import bg.sofia.uni.fmi.mjt.jobmatch.matching.SimilarityStrategy;
 import bg.sofia.uni.fmi.mjt.jobmatch.model.PlatformStatistics;
 import bg.sofia.uni.fmi.mjt.jobmatch.model.entity.Candidate;
@@ -15,9 +13,12 @@ import bg.sofia.uni.fmi.mjt.jobmatch.model.entity.Employer;
 import bg.sofia.uni.fmi.mjt.jobmatch.model.entity.JobPosting;
 import bg.sofia.uni.fmi.mjt.jobmatch.model.entity.Skill;
 import bg.sofia.uni.fmi.mjt.jobmatch.model.match.CandidateJobMatch;
+import bg.sofia.uni.fmi.mjt.jobmatch.model.match.CandidateJobMatchCandidateNameComparator;
+import bg.sofia.uni.fmi.mjt.jobmatch.model.match.CandidateJobMatchJobTitleComparator;
 import bg.sofia.uni.fmi.mjt.jobmatch.model.match.CandidateSimilarityMatch;
-import bg.sofia.uni.fmi.mjt.jobmatch.model.match.ImprovementScoreFirstSkillNameSecondDesc;
+import bg.sofia.uni.fmi.mjt.jobmatch.model.match.CandidateSimilarityMatchComparator;
 import bg.sofia.uni.fmi.mjt.jobmatch.model.match.SkillRecommendation;
+import bg.sofia.uni.fmi.mjt.jobmatch.model.match.SkillRecommendationComparator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,21 +29,27 @@ import java.util.Map;
 import java.util.Set;
 
 public class JobMatch implements JobMatchAPI {
-    private Map<String, Candidate> candidates;
-    private Map<String, Employer> employers;
-    private Map<String, JobPosting> jobPostings;
+    private final Map<String, Candidate> candidates;
+    private final Map<String, Employer> employers;
+    private final Map<String, JobPosting> jobPostings;
+    private final SimilarityStrategy defaultStrategy;
 
     public JobMatch() {
         this.candidates = new HashMap<>();
         this.employers = new HashMap<>();
         this.jobPostings = new HashMap<>();
+        this.defaultStrategy = new CosineSimilarity();
     }
 
     @Override
     public Candidate registerCandidate(Candidate candidate) {
-        //validateCandidate() и вътре може да сложиш тези двете
-        validateNotNull(candidate, "Candidate to register cannot be null!");
-        validateCandidateExists(candidate.getEmail());
+        if (candidate == null) {
+            throw new IllegalArgumentException("Candidate to register cannot be null!");
+        }
+
+        if (candidates.containsKey(candidate.getEmail())) {
+            throw new UserAlreadyExistsException("Candidate " + candidate.getEmail() + " already exists");
+        }
 
         candidates.put(candidate.getEmail(), candidate);
         return candidate;
@@ -50,8 +57,13 @@ public class JobMatch implements JobMatchAPI {
 
     @Override
     public Employer registerEmployer(Employer employer) {
-        validateNotNull(employer, "Employer to register cannot be null!");
-        validateEmployerExists(employer.email());
+        if (employer == null) {
+            throw new IllegalArgumentException("Employer to register cannot be null!");
+        }
+
+        if (employers.containsKey(employer.email())) {
+            throw new UserAlreadyExistsException("Employer with email " + employer.email() + " already exists");
+        }
 
         employers.put(employer.email(), employer);
         return employer;
@@ -59,8 +71,13 @@ public class JobMatch implements JobMatchAPI {
 
     @Override
     public JobPosting postJobPosting(JobPosting jobPosting) {
-        validateNotNull(jobPosting, "Job posting to register cannot be null!");
-        validateEmployerNotExists(jobPosting.getEmployerEmail());
+        if (jobPosting == null) {
+            throw new IllegalArgumentException("Job posting to register cannot be null!");
+        }
+
+        if (!employers.containsKey(jobPosting.getEmployerEmail())) {
+            throw new UserNotFoundException("Employer posting the job is not registered!");
+        }
 
         jobPostings.put(jobPosting.getId(), jobPosting);
         return jobPosting;
@@ -69,8 +86,7 @@ public class JobMatch implements JobMatchAPI {
     @Override
     public List<CandidateJobMatch> findTopNCandidatesForJob(String jobPostingId, int limit,
                                                             SimilarityStrategy strategy) {
-        validateFindInputs(jobPostingId, limit, strategy, "Job posting ID cannot be null, empty or blank!");
-        validateJobPostingNotExists(jobPostingId);
+        validateJobMatchInput(jobPostingId, limit, strategy);
 
         List<CandidateJobMatch> matchedCandidates = new ArrayList<>();
         Set<Skill> requiredSkills = jobPostings.get(jobPostingId).getRequiredSkills();
@@ -85,20 +101,15 @@ public class JobMatch implements JobMatchAPI {
             }
         }
 
-        Collections.sort(matchedCandidates, new SimilarityScoreFirstCandidateNameSecondDescJobMatchComparator());
+        Collections.sort(matchedCandidates, new CandidateJobMatchCandidateNameComparator());
 
-        if (matchedCandidates.size() > limit) {
-            matchedCandidates = matchedCandidates.subList(0, limit);
-        }
-
-        return Collections.unmodifiableList(matchedCandidates);
+        return limitedUnmodiableList(matchedCandidates, limit);
     }
 
     @Override
     public List<CandidateJobMatch> findTopNJobsForCandidate(String candidateEmail, int limit,
                                                             SimilarityStrategy strategy) {
-        validateFindInputs(candidateEmail, limit, strategy, "Candidate email cannot be null, empty or blank!");
-        validateCandidateNotExists(candidateEmail);
+        validateCandidateMatchInputs(candidateEmail, limit, strategy);
 
         Set<Skill> candidateSkills = candidates.get(candidateEmail).getSkills();
         List<CandidateJobMatch> matchedJobs = new ArrayList<>();
@@ -113,20 +124,15 @@ public class JobMatch implements JobMatchAPI {
             }
         }
 
-        Collections.sort(matchedJobs, new SimilarityScoreFirstJobTitleSecondDescJobMatchComparator());
+        Collections.sort(matchedJobs, new CandidateJobMatchJobTitleComparator());
 
-        if (matchedJobs.size() > limit) {
-            matchedJobs = matchedJobs.subList(0, limit);
-        }
-
-        return Collections.unmodifiableList(matchedJobs);
+        return limitedUnmodiableList(matchedJobs, limit);
     }
 
     @Override
     public List<CandidateSimilarityMatch> findSimilarCandidates(String candidateEmail, int limit,
                                                                 SimilarityStrategy strategy) {
-        validateFindInputs(candidateEmail, limit, strategy, "Candidate email cannot be null, empty or blank!");
-        validateCandidateNotExists(candidateEmail);
+        validateCandidateMatchInputs(candidateEmail, limit, strategy);
 
         Set<Skill> candidateSkills = candidates.get(candidateEmail).getSkills();
         List<CandidateSimilarityMatch> matchedCandidates = new ArrayList<>();
@@ -145,63 +151,138 @@ public class JobMatch implements JobMatchAPI {
             }
         }
 
-        Collections.sort(matchedCandidates, new SimilarityScoreFirstCandidateNameSecondDescSimilarityMatchComparator());
+        Collections.sort(matchedCandidates, new CandidateSimilarityMatchComparator());
 
-        if (matchedCandidates.size() > limit) {
-            matchedCandidates = matchedCandidates.subList(0, limit);
-        }
-
-        return Collections.unmodifiableList(matchedCandidates);
+        return limitedUnmodiableList(matchedCandidates, limit);
     }
 
     @Override
     public List<SkillRecommendation> getSkillRecommendationsForCandidate(String candidateEmail, int limit) {
-        SimilarityStrategy defaultStrategy = new CosineSimilarity();
-        validateFindInputs(candidateEmail, limit, defaultStrategy, "Candidate email cannot be null, empty or blank!");
-        validateCandidateNotExists(candidateEmail);
+        validateCandidateMatchInputs(candidateEmail, limit, defaultStrategy);
 
         Set<Skill> candidateSkills = candidates.get(candidateEmail).getSkills();
         List<SkillRecommendation> skillRecommendations = getSkillRecommendationsList(candidateSkills, defaultStrategy);
 
-        Collections.sort(skillRecommendations, new ImprovementScoreFirstSkillNameSecondDesc());
-
-        if (skillRecommendations.size() > limit) {
-            skillRecommendations = skillRecommendations.subList(0, limit);
-        }
-
-        return Collections.unmodifiableList(skillRecommendations);
+        Collections.sort(skillRecommendations, new SkillRecommendationComparator());
+        //4. Return top N skills ranked by total improvement potential
+        return limitedUnmodiableList(skillRecommendations, limit);
     }
 
     @Override
     public PlatformStatistics getPlatformStatistics() {
-        int totalCandidates = candidates.size();
-        int totalEmployers = employers.size();
-        int totalJobPostings = jobPostings.size();
-        String mostCommonSkillName = null;
-        String highestPaidJobTitle = null;
+        return new PlatformStatistics(candidates.size(), employers.size(), jobPostings.size(), getMostCommonSkillName(),
+            getHighestPaidJobTitle());
+    }
 
-        if (!candidates.isEmpty()) {
-            mostCommonSkillName = getMostCommonSkillName();
-        }
-        if (!jobPostings.isEmpty()) {
-            highestPaidJobTitle = getHighestPaidJobTitle();
+    private void validateJobMatchInput(String jobPostingId, int limit, SimilarityStrategy strategy) {
+        if (jobPostingId == null || jobPostingId.isBlank()) {
+            throw new IllegalArgumentException("Job posting ID cannot be null or blank!");
         }
 
-        return new PlatformStatistics(totalCandidates, totalEmployers, totalJobPostings, mostCommonSkillName,
-            highestPaidJobTitle);
+        if (limit <= 0) {
+            throw new IllegalArgumentException("Limit must be positive!");
+        }
+
+        if (strategy == null) {
+            throw new IllegalArgumentException("Strategy cannot be null!");
+        }
+
+        if (!jobPostings.containsKey(jobPostingId)) {
+            throw new JobPostingNotFoundException("Job posting with this ID does not exist!");
+        }
+    }
+
+    private void validateCandidateMatchInputs(String candidateEmail, int limit, SimilarityStrategy strategy) {
+        if (candidateEmail == null || candidateEmail.isBlank()) {
+            throw new IllegalArgumentException("Candidate email cannot be null or blank!");
+        }
+
+        if (limit <= 0) {
+            throw new IllegalArgumentException("Limit must be positive!");
+        }
+
+        if (strategy == null) {
+            throw new IllegalArgumentException("Strategy cannot be null!");
+        }
+
+        if (!candidates.containsKey(candidateEmail)) {
+            throw new CandidateNotFoundException("Candidate with this email does not exist!");
+        }
+    }
+
+    private <T> List<T> limitedUnmodiableList(List<T> list, int limit) {
+        if (list.size() > limit) {
+            return Collections.unmodifiableList(list.subList(0, limit));
+        }
+
+        return Collections.unmodifiableList(list);
+    }
+
+    private List<SkillRecommendation> getSkillRecommendationsList(Set<Skill> candidateSkills,
+                                                                  SimilarityStrategy defaultStrategy) {
+        List<SkillRecommendation> skillRecommendations = new ArrayList<>();
+        Map<String, Double> aggregatedImprovements = aggregateSkillImprovements(candidateSkills, defaultStrategy);
+
+        for (String skillName : aggregatedImprovements.keySet()) {
+            skillRecommendations.add(new SkillRecommendation(skillName, aggregatedImprovements.get(skillName)));
+        }
+
+        return skillRecommendations;
+    }
+
+    //This class combines all missing skills at the highest required level
+    //3. Aggregate (sum up) improvements across all job postings for each missing skill
+    private Map<String, Double> aggregateSkillImprovements(Set<Skill> candidateSkills,
+                                                           SimilarityStrategy defaultStrategy) {
+        Map<String, Double> aggregatedImprovements = new HashMap<>();
+        //For each job posting, calculate current similarity score with the candidate
+        for (JobPosting jobPosting : jobPostings.values()) {
+            double similarityScore =
+                defaultStrategy.calculateSimilarity(candidateSkills, jobPosting.getRequiredSkills());
+
+            processSkillImprovements(candidateSkills, jobPosting.getRequiredSkills(), defaultStrategy, similarityScore,
+                aggregatedImprovements);
+        }
+
+        return aggregatedImprovements;
+    }
+
+    private void processSkillImprovements(Set<Skill> candidateSkills, Set<Skill> requiredSkills,
+                                          SimilarityStrategy defaultStrategy,
+                                          double currentSimilarityScore,
+                                          Map<String, Double> aggregatedImprovements) {
+        for (Skill requiredSkill : requiredSkills) {
+            //For each skill the candidate is MISSING (present in job but not in candidate profile):
+            if (!candidateSkills.contains(requiredSkill)) {
+                // Temporarily add that skill to candidate's profile with level equal to the max. required
+                Set<Skill> modifiedCandidateSkills = new HashSet<>(candidateSkills);
+                modifiedCandidateSkills.add(
+                    new Skill(requiredSkill.name(), getMaxRequiredLevelAcrossAllPostings(requiredSkill.name())));
+
+                //Recalculate similarity score
+                double recalculatedSimilarityScore =
+                    defaultStrategy.calculateSimilarity(modifiedCandidateSkills, requiredSkills);
+
+                //Calculate improvement: new_score - old_score
+                double improvement = recalculatedSimilarityScore - currentSimilarityScore;
+
+                if (aggregatedImprovements.containsKey(requiredSkill.name())) {
+                    double currentImprovement = aggregatedImprovements.get(requiredSkill.name());
+                    aggregatedImprovements.put(requiredSkill.name(), currentImprovement + improvement);
+                } else {
+                    aggregatedImprovements.put(requiredSkill.name(), improvement);
+                }
+            }
+        }
     }
 
     private int getMaxRequiredLevelAcrossAllPostings(String skillName) {
         int maxRequiredLevel = 0;
 
         for (JobPosting jobPosting : jobPostings.values()) {
-            Set<Skill> requiredSkills = jobPosting.getRequiredSkills();
-
-            for (Skill skill : requiredSkills) {
-                if (skill.name().equals(skillName)) {
-                    if (maxRequiredLevel < skill.level()) {
-                        maxRequiredLevel = skill.level();
-                    }
+            for (Skill skill : jobPosting.getRequiredSkills()) {
+                if (skill.name().equals(skillName) && skill.level() > maxRequiredLevel) {
+                    maxRequiredLevel = skill.level();
                 }
             }
         }
@@ -209,52 +290,42 @@ public class JobMatch implements JobMatchAPI {
         return maxRequiredLevel;
     }
 
-    private void copySkillImprovements(Map<String, Double> fromAggregatedImprovements,
-                                       List<SkillRecommendation> toSkillRecommendations) {
-        for (String skillName : fromAggregatedImprovements.keySet()) {
-            toSkillRecommendations.add(new SkillRecommendation(skillName, fromAggregatedImprovements.get(skillName)));
+    private String getMostCommonSkillName() {
+        if (candidates.isEmpty()) {
+            return null;
         }
+
+        Map<String, Integer> skillsNameOccurrences = countSkillFrequencies();
+
+        return findMostCommonSkill(skillsNameOccurrences);
     }
 
-    private List<SkillRecommendation> getSkillRecommendationsList(Set<Skill> candidateSkills,
-                                                                  SimilarityStrategy defaultStrategy) {
-        List<SkillRecommendation> skillRecommendations = new ArrayList<>();
-        Map<String, Double> aggregatedImprovements = new HashMap<>();
+    private Map<String, Integer> countSkillFrequencies() {
+        Map<String, Integer> skillsNameOccurences = new HashMap<>();
 
-        for (JobPosting jobPosting : jobPostings.values()) {
-            Set<Skill> requiredSkills = jobPosting.getRequiredSkills();
+        for (Candidate candidate : candidates.values()) {
+            Set<Skill> candidateSkills = candidate.getSkills();
 
-            double similarityScore = defaultStrategy.calculateSimilarity(candidateSkills, requiredSkills);
+            for (Skill skill : candidateSkills) {
+                String skillName = skill.name();
 
-            for (Skill requiredSkill : requiredSkills) {
-                if (!candidateSkills.contains(requiredSkill)) {
-                    Set<Skill> modifiedCandidateSkills = new HashSet<>(candidateSkills);
-                    modifiedCandidateSkills.add(
-                        new Skill(requiredSkill.name(), getMaxRequiredLevelAcrossAllPostings(requiredSkill.name())));
-                    double recalculatedSimilarityScore =
-                        defaultStrategy.calculateSimilarity(modifiedCandidateSkills, requiredSkills);
-                    double improvement = recalculatedSimilarityScore - similarityScore;
-
-                    if (aggregatedImprovements.containsKey(requiredSkill.name())) {
-                        double currentImprovement = aggregatedImprovements.get(requiredSkill.name());
-                        aggregatedImprovements.put(requiredSkill.name(), currentImprovement + improvement);
-                    } else {
-                        aggregatedImprovements.put(requiredSkill.name(), improvement);
-                    }
+                if (skillsNameOccurences.containsKey(skillName)) {
+                    skillsNameOccurences.put(skillName, skillsNameOccurences.get(skillName) + 1);
+                } else {
+                    skillsNameOccurences.put(skill.name(), 1);
                 }
             }
         }
-        copySkillImprovements(aggregatedImprovements, skillRecommendations);
-        return skillRecommendations;
+
+        return skillsNameOccurences;
     }
 
-    private String getMostCommonSkillName() {
+    private String findMostCommonSkill(Map<String, Integer> skillsNameOccurences) {
         String mostCommonSkillName = "";
         int mostOccurances = 0;
-        Map<String, Integer> skillsNameOccurrences = countSkillFrequencies();
 
-        for (String skillName : skillsNameOccurrences.keySet()) {
-            int skillNameOccurrences = skillsNameOccurrences.get(skillName);
+        for (String skillName : skillsNameOccurences.keySet()) {
+            int skillNameOccurrences = skillsNameOccurences.get(skillName);
 
             if (skillNameOccurrences > mostOccurances) {
                 mostOccurances = skillNameOccurrences;
@@ -269,93 +340,27 @@ public class JobMatch implements JobMatchAPI {
         return mostCommonSkillName;
     }
 
-    private Map<String, Integer> countSkillFrequencies() {
-        Map<String, Integer> skillsNameOccurences = new HashMap<>();
-
-        for (Candidate candidate : candidates.values()) {
-            Set<Skill> candidateSkills = candidate.getSkills();
-
-            for (Skill skill : candidateSkills) {
-                if (!skillsNameOccurences.containsKey(skill.name())) {
-                    skillsNameOccurences.put(skill.name(), 1);
-                } else {
-                    int occurances = skillsNameOccurences.get(skill.name()) + 1;
-                    skillsNameOccurences.put(skill.name(), occurances);
-                }
-            }
+    private String getHighestPaidJobTitle() {
+        if (jobPostings.isEmpty()) {
+            return null;
         }
 
-        return skillsNameOccurences;
-    }
-
-    private String getHighestPaidJobTitle() {
-        double highestPaidJob = 0;
+        double highestPaidJob = -1;
         String highestPaidJobTitle = "";
 
         for (JobPosting jobPosting : jobPostings.values()) {
-            if (jobPosting.getSalary() == highestPaidJob) {
+            double currentSalary = jobPosting.getSalary();
+
+            if (currentSalary > highestPaidJob) {
+                highestPaidJob = currentSalary;
+                highestPaidJobTitle = jobPosting.getTitle();
+            } else if (currentSalary == highestPaidJob) {
                 if (highestPaidJobTitle.compareTo(jobPosting.getTitle()) > 0) {
                     highestPaidJobTitle = jobPosting.getTitle();
                 }
-            } else if (jobPosting.getSalary() > highestPaidJob) {
-                highestPaidJobTitle = jobPosting.getTitle();
             }
         }
 
         return highestPaidJobTitle;
-    }
-
-    private void validateNotNull(Object object, String message) {
-        if (object == null) {
-            throw new IllegalArgumentException(message);
-        }
-    }
-
-    private void validateCandidateExists(String email) {
-        if (candidates.containsKey(email)) {
-            throw new UserAlreadyExistsException("Candidate " + email + " already exists");
-        }
-    }
-
-    private void validateEmployerExists(String email) {
-        if (employers.containsKey(email)) {
-            throw new UserAlreadyExistsException("Employer with email " + email + " already exists");
-        }
-    }
-
-    private void validateEmployerNotExists(String email) {
-        if (!employers.containsKey(email)) {
-            throw new UserAlreadyExistsException(
-                "Employer posting the job is not registered!");
-        }
-    }
-
-    private void validateString(String input, String message) {
-        if (input == null || input.isBlank()) {
-            throw new IllegalArgumentException(message);
-        }
-    }
-
-    private void validateFindInputs(String input, int limit,
-                                    SimilarityStrategy strategy, String message) {
-        validateString(input, message);
-
-        if (limit <= 0) {
-            throw new IllegalArgumentException("Limit must be positive!");
-        }
-
-        validateNotNull(strategy, "Strategy cannot be null!");
-    }
-
-    private void validateJobPostingNotExists(String jobPostingID) {
-        if (!jobPostings.containsKey(jobPostingID)) {
-            throw new JobPostingNotFoundException("Job posting with this ID does not exist!");
-        }
-    }
-
-    private void validateCandidateNotExists(String candidateEmail) {
-        if (!candidates.containsKey(candidateEmail)) {
-            throw new CandidateNotFoundException("Candidate with this email does not exist!");
-        }
     }
 }

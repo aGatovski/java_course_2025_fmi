@@ -15,11 +15,11 @@ public record PlatformStatistics(int totalCandidates, int totalEmployers, int to
             throw new IllegalArgumentException("Total job postings cannot be negative");
         }
 
-        if (mostCommonSkillName.isBlank()) {
+        if (mostCommonSkillName != null && mostCommonSkillName.isBlank()) {
             throw new IllegalArgumentException("Most common skill name cannot be blank");
         }
 
-        if (highestPaidJobTitle.isBlank()) {
+        if (highestPaidJobTitle != null && highestPaidJobTitle.isBlank()) {
             throw new IllegalArgumentException("Highest paid job title cannot be blank");
         }
     }

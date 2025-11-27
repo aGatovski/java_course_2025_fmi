@@ -11,9 +11,7 @@ public class JaccardSimilarity implements SimilarityStrategy {
 
     @Override
     public double calculateSimilarity(Set<Skill> candidateSkills, Set<Skill> jobSkills) {
-        if (candidateSkills == null || jobSkills == null) {
-            throw new IllegalArgumentException("Skills sets cannot be null!");
-        }
+        validateSkillsSet(candidateSkills, jobSkills);
 
         if (candidateSkills.isEmpty() && jobSkills.isEmpty()) {
             return 0;
@@ -36,5 +34,11 @@ public class JaccardSimilarity implements SimilarityStrategy {
         union.addAll(jobSkillNames);
 
         return (double) intersection.size() / (double) union.size();
+    }
+
+    private void validateSkillsSet(Set<Skill> candidateSkills, Set<Skill> jobSkills) {
+        if (candidateSkills == null || jobSkills == null) {
+            throw new IllegalArgumentException("Skill sets cannot be null!");
+        }
     }
 }

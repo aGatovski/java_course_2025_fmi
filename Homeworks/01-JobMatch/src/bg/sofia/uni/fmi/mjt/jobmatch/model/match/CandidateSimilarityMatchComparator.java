@@ -1,11 +1,8 @@
-package bg.sofia.uni.fmi.mjt.jobmatch.matching;
-
-import bg.sofia.uni.fmi.mjt.jobmatch.model.match.CandidateSimilarityMatch;
+package bg.sofia.uni.fmi.mjt.jobmatch.model.match;
 
 import java.util.Comparator;
 
-public class SimilarityScoreFirstCandidateNameSecondDescSimilarityMatchComparator
-    implements Comparator<CandidateSimilarityMatch> {
+public class CandidateSimilarityMatchComparator implements Comparator<CandidateSimilarityMatch> {
     @Override
     public int compare(CandidateSimilarityMatch candidateSimilarityMatch1,
                        CandidateSimilarityMatch candidateSimilarityMatch2) {
@@ -21,4 +18,3 @@ public class SimilarityScoreFirstCandidateNameSecondDescSimilarityMatchComparato
             candidateSimilarityMatch1.getSimilarityScore());
     }
 }
-

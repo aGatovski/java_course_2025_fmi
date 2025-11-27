@@ -1,10 +1,8 @@
-package bg.sofia.uni.fmi.mjt.jobmatch.matching;
-
-import bg.sofia.uni.fmi.mjt.jobmatch.model.match.CandidateJobMatch;
+package bg.sofia.uni.fmi.mjt.jobmatch.model.match;
 
 import java.util.Comparator;
 
-public class SimilarityScoreFirstJobTitleSecondDescJobMatchComparator implements Comparator<CandidateJobMatch> {
+public class CandidateJobMatchJobTitleComparator implements Comparator<CandidateJobMatch> {
     @Override
     public int compare(CandidateJobMatch candidateJobMatch1, CandidateJobMatch candidateJobMatch2) {
         //2. If scores are equal, by job title in alphabetical order (case-sensitive)

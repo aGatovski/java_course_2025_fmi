@@ -13,9 +13,7 @@ public class CosineSimilarity implements SimilarityStrategy {
 
     @Override
     public double calculateSimilarity(Set<Skill> candidateSkills, Set<Skill> jobSkills) {
-        if (candidateSkills == null || jobSkills == null) {
-            throw new IllegalArgumentException("Skill sets cannot be null!");
-        }
+        validateSkillsSet(candidateSkills, jobSkills);
 
         if (candidateSkills.isEmpty() && jobSkills.isEmpty()) {
             return 0;
@@ -33,7 +31,13 @@ public class CosineSimilarity implements SimilarityStrategy {
             jobVector[i] = getSkillLevel(jobSkills, skillName);
         }
 
-        return cosineSimilarity(candidateVector, jobVector);
+        return calculateCosineSimilarity(candidateVector, jobVector);
+    }
+
+    private void validateSkillsSet(Set<Skill> candidateSkills, Set<Skill> jobSkills) {
+        if (candidateSkills == null || jobSkills == null) {
+            throw new IllegalArgumentException("Skill sets cannot be null!");
+        }
     }
 
     private int getSkillLevel(Set<Skill> skills, String skillName) {
@@ -64,7 +68,7 @@ public class CosineSimilarity implements SimilarityStrategy {
         return combinedSkillsList;
     }
 
-    private double cosineSimilarity( int[] candidateVector, int[] jobVector) {
+    private double calculateCosineSimilarity( int[] candidateVector, int[] jobVector) {
         double dotProduct = 0;
         double normA = 0;
         double normB = 0;

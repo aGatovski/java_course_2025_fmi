@@ -1,5 +1,6 @@
 package bg.sofia.uni.fmi.mjt.jobmatch.model.entity;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class JobPosting {
@@ -36,7 +37,7 @@ public class JobPosting {
     }
 
     public Set<Skill> getRequiredSkills() {
-        return requiredSkills;
+        return new HashSet<>(requiredSkills);
     }
 
     public Education getRequiredEducation() {
@@ -80,7 +81,7 @@ public class JobPosting {
             throw new IllegalArgumentException("Required skills cannot be null or empty");
         }
 
-        this.requiredSkills = requiredSkills;
+        this.requiredSkills = new HashSet<>(requiredSkills);
     }
 
     private void setRequiredEducation(Education requiredEducation) {
