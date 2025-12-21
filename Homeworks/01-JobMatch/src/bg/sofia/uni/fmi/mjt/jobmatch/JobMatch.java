@@ -363,4 +363,46 @@ public class JobMatch implements JobMatchAPI {
 
         return highestPaidJobTitle;
     }
+
+
+    public List<Skill> getMAxLevelIntheJOb(Candidate candidate) {
+
+        List<Skill> toREturn = new ArrayList<>();
+
+        var candidateSkill = candidate.getSkills();
+
+        for (JobPosting jobPosting : jobPostings.values()) {
+           var requ = jobPosting.getRequiredSkills();
+
+
+
+            for (Skill skill : requ) {
+                if(!candidateSkill.contains(skill) && !toREturn.contains(skill)) {
+                    int maxL = getMaxSkillLEvel(skill);
+                    toREturn.add(new Skill(skill.name(), maxL));
+                }
+            }
+        }
+
+        return toREturn;
+    }
+
+    int getMaxSkillLEvel(Skill skill) {
+        int maxLvl = 0;
+        for (JobPosting jobPosting : jobPostings.values()) {
+            var requ = jobPosting.getRequiredSkills();
+            for(Skill skill1 : requ) {
+
+                if(skill1.name().equals(skill.name())) {
+                    if(skill1.level() > maxLvl) {
+                        maxLvl = skill.level();
+                    }
+                }
+
+            }
+        }
+
+        return maxLvl;
+    }
+
 }
