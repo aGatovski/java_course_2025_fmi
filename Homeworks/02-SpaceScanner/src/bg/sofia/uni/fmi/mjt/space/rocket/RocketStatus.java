@@ -13,4 +13,12 @@ public enum RocketStatus {
     public String toString() {
         return value;
     }
+
+    public static RocketStatus find(String val) {
+        for (RocketStatus rocketStatus : RocketStatus.values()) {
+            if (rocketStatus.value.equals(val))
+                return rocketStatus;
+        }
+        throw new IllegalStateException(String.format("Unsupported type %s.", val));
+    }
 }

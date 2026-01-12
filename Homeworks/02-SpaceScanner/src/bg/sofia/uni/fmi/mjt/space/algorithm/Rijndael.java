@@ -37,7 +37,7 @@ public class Rijndael implements SymmetricBlockCipher {
 
         try {
             Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
-            cipher.init(Cipher.DECRYPT_MODE, this.secretKey);
+            cipher.init(Cipher.ENCRYPT_MODE, this.secretKey);
 
             try (var encryptedOutputSteam = new CipherOutputStream(outputStream, cipher)) {
                 inputStream.transferTo(encryptedOutputSteam);
@@ -62,7 +62,7 @@ public class Rijndael implements SymmetricBlockCipher {
 
         try {
             Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
-            cipher.init(Cipher.ENCRYPT_MODE, this.secretKey);
+            cipher.init(Cipher.DECRYPT_MODE, this.secretKey);
 
             try (OutputStream decryptedOutputStream = new CipherOutputStream(outputStream,
                 cipher)) {

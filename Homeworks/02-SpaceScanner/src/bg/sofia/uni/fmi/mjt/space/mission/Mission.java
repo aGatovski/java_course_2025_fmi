@@ -46,10 +46,6 @@ public record Mission(String id, String company, String location, LocalDate date
             throw new IllegalArgumentException("Rocket status cannot be null");
         }
 
-        if (cost == null) {
-            throw new IllegalArgumentException("Cost container cannot be null");
-        }
-
         if (cost.isPresent() && cost.get() < 0) {
             throw new IllegalArgumentException("Cost cannot be negative");
         }
@@ -76,15 +72,17 @@ public record Mission(String id, String company, String location, LocalDate date
         }
 
         String[] tokensDetail = tokens[DETAIL_COLUMN].split(DETAILS_DELIMITER);
-        LocalDate missionDate = LocalDate.parse(tokens[DATE_COLUMN], DateTimeFormatter.ofPattern("E MMM dd, yyyy"));
-        Optional<Double> missionCost = tokens[COST_COLUMN].isBlank()
-            ? Optional.empty()
-            : Optional.of(Double.parseDouble(tokens[COST_COLUMN].replace(",", "")));
+        LocalDate missionDate = LocalDate.parse(tokens[DATE_COLUMN],
+            DateTimeFormatter.ofPattern("E MMM dd, yyyy", java.util.Locale.ENGLISH));
 
-        return new Mission(tokens[ID_COLUMN], tokens[COMPANY_COLUMN], tokens[LOCATION_COLUMN],
-            LocalDate.parse(tokens[DATE_COLUMN], DateTimeFormatter.ofPattern("E MMM dd, yyyy")),
+        Optional<Double> missionCost = Optional.empty();
+        if (!tokens[COST_COLUMN].isBlank()) {
+            missionCost = Optional.of(Double.parseDouble(tokens[COST_COLUMN].replace(",", "")));
+        }
+
+        return new Mission(tokens[ID_COLUMN], tokens[COMPANY_COLUMN], tokens[LOCATION_COLUMN], missionDate,
             new Detail(tokensDetail[0].trim(), tokensDetail[1].trim()),
-            RocketStatus.valueOf(tokens[ROCKET_STATUS_COLUMN]), missionCost,
-            MissionStatus.valueOf(tokens[MISSION_STATUS_COLUMN]));
+            RocketStatus.find(tokens[ROCKET_STATUS_COLUMN]), missionCost,
+            MissionStatus.find(tokens[MISSION_STATUS_COLUMN]));
     }
 }

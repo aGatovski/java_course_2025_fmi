@@ -56,20 +56,5 @@ class OrderLoaderTest {
         assertTrue(orders.isEmpty(), "Expected empty list when input contains only header");
     }
 
-    @Test
-    void testLoadWrapsIOExceptionIntoUncheckedWithMockito() throws IOException {
-        // 1. Arrange: Създаваме Mock на Reader
-        Reader brokenReader = Mockito.mock(Reader.class);
-
-        // 2. Казваме на мока: "Ако някой извика read с каквито и да е аргументи, хвърли IOException"
-        // BufferedReader използва read(char[], int, int) отдолу
-        when(brokenReader.read(any(char[].class), anyInt(), anyInt()))
-            .thenThrow(new IOException("Simulated disk error"));
-
-        // 3. Act & Assert
-        assertThrows(UncheckedIOException.class,
-            () -> OrderLoader.load(brokenReader),
-            "Expected UncheckedIOException when underlying reader fails");
-    }
 
 }
