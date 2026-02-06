@@ -2,17 +2,16 @@ package bg.sofia.uni.fmi.mjt.news.client;
 
 import bg.sofia.uni.fmi.mjt.news.exception.ApiKeyException;
 import bg.sofia.uni.fmi.mjt.news.exception.NewsApiException;
-import bg.sofia.uni.fmi.mjt.news.model.NewsErrorResponse;
 import bg.sofia.uni.fmi.mjt.news.model.NewsSuccessResponse;
 import bg.sofia.uni.fmi.mjt.news.query.NewsQuery;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NewsApiClient {
+public class NewsApiImplementation {
     private final NewsHttpClient httpClient;
     private final Map<NewsQuery, NewsSuccessResponse> cacheResponseMap;
 
-    public NewsApiClient(String apiKey) throws ApiKeyException {
+    public NewsApiImplementation(String apiKey) throws ApiKeyException {
         if (apiKey == null || apiKey.isBlank()) {
             throw new ApiKeyException("Api key is required!");
         }
