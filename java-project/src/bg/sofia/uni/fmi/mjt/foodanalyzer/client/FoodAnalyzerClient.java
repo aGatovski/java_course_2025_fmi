@@ -14,7 +14,7 @@ public class FoodAnalyzerClient {
     private static String handleResponse(BufferedReader reader) throws IOException {
         StringBuilder response = new StringBuilder();
         String line;
-        //Without end response it is waiting forever I do not know other way to fix this...
+
         while ((line = reader.readLine()) != null) {
             if (line.equalsIgnoreCase("END_RESPONSE")) {
                 break;
@@ -35,7 +35,7 @@ public class FoodAnalyzerClient {
 
             while (true) {
                 System.out.print("> ");
-                String clientCommandMessage = scanner.nextLine().trim(); // read a line from the console
+                String clientCommandMessage = scanner.nextLine().trim();
 
                 if (clientCommandMessage.isBlank()) {
                     continue;
@@ -45,7 +45,7 @@ public class FoodAnalyzerClient {
                     break;
                 }
 
-                writer.println(clientCommandMessage); // send the message to the server
+                writer.println(clientCommandMessage);
 
                 String response = handleResponse(reader);
                 System.out.println(response);

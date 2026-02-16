@@ -17,9 +17,7 @@ public class CommandExecutor {
             Command command = commandFactory.createCommand(commandString);
             return command.execute();
         } catch (InvalidCommandException e) {
-            Logger.logError("Invalid command: " + e.getMessage(), e);
-            //do i need to log invalid commands dont do stuff
-            return e.getMessage();
+            throw e;
         } catch (IOException e) {
             Logger.logError(e.getMessage(), e); //failed decoding
             return e.getMessage();

@@ -5,6 +5,7 @@ import bg.sofia.uni.fmi.mjt.foodanalyzer.server.api.FoodDataApiClient;
 import bg.sofia.uni.fmi.mjt.foodanalyzer.server.api.dto.AbridgedFoodNutrient;
 import bg.sofia.uni.fmi.mjt.foodanalyzer.server.api.dto.FoodDetailsResponse;
 import bg.sofia.uni.fmi.mjt.foodanalyzer.server.cache.CacheManager;
+import bg.sofia.uni.fmi.mjt.foodanalyzer.server.logger.Logger;
 import com.google.gson.Gson;
 
 import java.util.Optional;
@@ -17,6 +18,9 @@ public class GetFoodReportCommand implements Command {
     private static final Gson GSON = new Gson();
 
     public GetFoodReportCommand(int foodFdcId) {
+        if (foodFdcId <= 0) {
+            throw new IllegalArgumentException("Food FDC ID must be positive!");
+        }
         this.foodFdcId = foodFdcId;
     }
 
@@ -37,7 +41,8 @@ public class GetFoodReportCommand implements Command {
 
             return formatSearchResultFood(response);
         } catch (ApiException e) {
-            throw new RuntimeException(e);
+            Logger.logError("API error during food report search", e);
+            return "Failed to fetch food report for " + foodFdcId;
         }
     }
 

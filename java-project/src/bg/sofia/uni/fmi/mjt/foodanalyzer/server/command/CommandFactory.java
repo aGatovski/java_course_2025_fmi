@@ -19,31 +19,48 @@ public class CommandFactory {
     }
 
     public Command createCommand(String commandString) throws InvalidCommandException, IOException {
-        if (commandString == null || commandString.trim().isBlank()) {
-            throw new InvalidCommandException("Command cannot be null or blank!");
-        }
+        validateStringCommand(commandString);
 
         String[] commandParts = commandString.trim().split("\\s+", 2);
         String cmd = commandParts[0].toLowerCase();
 
-        if (commandParts.length < 2) {
-            throw new InvalidCommandException("Missing command arguments!");
-        }
-
         switch (cmd) {
             case CMD_GET_FOOD:
-                return new GetFoodCommand(commandParts[1]);
-            case CMD_GET_FOOD_REPORT:
-                if (!isValidFdcId(commandParts[1])) {
-                    throw new InvalidCommandException("FCD ID must be a positive integer!");
+                if (isValidCommand(commandParts)) {
+                    return new GetFoodCommand(commandParts[1]);
                 }
 
-                return new GetFoodReportCommand(Integer.parseInt(commandParts[1].trim()));
+                throw new InvalidCommandException("Missing food name! Command usage get-food <food_name>");
+            case CMD_GET_FOOD_REPORT:
+                if (isValidCommand(commandParts)) {
+                    if (isValidFdcId(commandParts[1])) {
+                        return new GetFoodReportCommand(Integer.parseInt(commandParts[1].trim()));
+                    }
+
+                    throw new InvalidCommandException(
+                        "FDC ID must be positive! Command usage get-food-report positive <fdc_id>");
+                }
+
+                throw new InvalidCommandException("Missing FDC ID! Command usage get-food-report positive <fdc_id>");
             case CMD_GET_FOOD_BY_BARCODE:
-                return new GetFoodByBarcodeCommand(extractBarcode(commandParts[1].trim()));
+                if (isValidCommand(commandParts)) {
+                    return new GetFoodByBarcodeCommand(extractBarcode(commandParts[1].trim()));
+                }
+                throw new InvalidCommandException(
+                    "Invalid barcode command. Must specify --code=<barcode> or --img=<image path>!");
             default:
-                throw new InvalidCommandException("Unknown command");
+                throw new InvalidCommandException("Unknown command!");
         }
+    }
+
+    private void validateStringCommand(String commandString) throws InvalidCommandException {
+        if (commandString == null || commandString.trim().isBlank()) {
+            throw new InvalidCommandException("Command cannot be null or blank!");
+        }
+    }
+
+    private boolean isValidCommand(String[] commandParts) {
+        return commandParts.length >= 2 && !commandParts[1].isBlank();
     }
 
     private boolean isValidFdcId(String fdcIdString) {
@@ -70,9 +87,8 @@ public class CommandFactory {
             try {
                 return BarcodeReader.decodeBarcode(imgMatcher.group(1));
             } catch (IOException e) {
-                throw new InvalidCommandException("Failed to decode barcode from image!");
+                throw new InvalidCommandException("Failed to decode barcode from image: " + e.getMessage());
             }
-
         }
 
         throw new InvalidCommandException(

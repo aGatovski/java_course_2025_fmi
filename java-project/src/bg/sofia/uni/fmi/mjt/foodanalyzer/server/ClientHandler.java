@@ -32,8 +32,7 @@ public class ClientHandler implements Runnable {
              this.socket) {
 
             String command;
-            while ((command = in.readLine()) != null && !command.equalsIgnoreCase("quit")) {
-
+            while ((command = in.readLine()) != null) {
                 if (command.isBlank()) {
                     continue;
                 }
@@ -43,19 +42,7 @@ public class ClientHandler implements Runnable {
                     break;
                 }
 
-                //String response = "";
-                try {
-                    String response = commandExecutor.execute(command);
-                    out.println(response);
-                } catch (InvalidCommandException e) {
-                    out.println("Error: " + e.getMessage());
-                    Logger.logError("Invalid command: " + e.getMessage(), e);
-                } catch (Exception e) {
-                    Logger.logError("Error executing command from " + clientAddress, e);
-                    out.println("Unexpected error occurred. Check error logs!");
-                }
-
-                //out.println(response);
+                processCommand(command, out, clientAddress);
                 out.println("END_RESPONSE");
             }
         } catch (IOException e) {
@@ -64,4 +51,18 @@ public class ClientHandler implements Runnable {
             Logger.logError("Unexpected error handling client " + clientAddress, e);
         }
     }
+
+    private void processCommand(String command, PrintWriter out, String clientAddress) {
+        try {
+            String response = commandExecutor.execute(command);
+            out.println(response);
+        } catch (InvalidCommandException e) {
+            out.println("Error: " + e.getMessage());
+            Logger.logError("Invalid command: " + e.getMessage(), e);
+        } catch (Exception e) {
+            Logger.logError("Error executing command from " + clientAddress, e);
+            out.println("Unexpected error occurred. Check error logs!");
+        }
+    }
 }
+

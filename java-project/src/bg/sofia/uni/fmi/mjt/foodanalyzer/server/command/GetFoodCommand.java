@@ -8,6 +8,7 @@ import bg.sofia.uni.fmi.mjt.foodanalyzer.server.api.dto.SearchResultFood;
 import bg.sofia.uni.fmi.mjt.foodanalyzer.server.cache.CacheManager;
 import bg.sofia.uni.fmi.mjt.foodanalyzer.server.logger.Logger;
 import com.google.gson.Gson;
+
 import java.util.Optional;
 
 public class GetFoodCommand implements Command {
@@ -18,7 +19,11 @@ public class GetFoodCommand implements Command {
     private static final Gson GSON = new Gson();
 
     public GetFoodCommand(String foodName) {
+        if (foodName == null || foodName.isBlank()) {
+            throw new IllegalArgumentException("Food name cannot be null or empty!");
+        }
         this.foodName = foodName;
+
     }
 
     @Override
@@ -40,7 +45,7 @@ public class GetFoodCommand implements Command {
             return formatSearchResult(response);
         } catch (ApiException e) {
             Logger.logError("API error during food search", e);
-            return "Failed to ";
+            return "Failed to search for food " + foodName;
         }
     }
 
@@ -71,16 +76,19 @@ public class GetFoodCommand implements Command {
     }
 
     private void cacheBarcodeFromResponse(SearchResult response) {
-        if (response.foods() != null) {
-            for (SearchResultFood food : response.foods()) {
-                if (food.gtinUpc() != null && !food.gtinUpc().isBlank()) {
-                    try {
-                        cacheManager.cacheBarcode(food.gtinUpc(), food.fdcId());
-                    } catch (CacheException e) {
-                        Logger.logError("Failed to cache barcode mapping: " + e.getMessage(), e);
-                    }
+        if (response == null || response.foods() == null) {
+            return;
+        }
+
+        for (SearchResultFood food : response.foods()) {
+            if (food.gtinUpc() != null && !food.gtinUpc().isBlank()) {
+                try {
+                    cacheManager.cacheBarcode(food.gtinUpc(), food.fdcId());
+                } catch (CacheException e) {
+                    Logger.logError("Failed to cache barcode mapping: " + food.gtinUpc(), e);
                 }
             }
         }
+
     }
 }
