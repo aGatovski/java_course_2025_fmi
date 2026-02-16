@@ -704,3 +704,25 @@ java.net.SocketException: Connection reset
 	at bg.sofia.uni.fmi.mjt.foodanalyzer.client.FoodAnalyzerClient.handleResponse(FoodAnalyzerClient.java:20)
 	at bg.sofia.uni.fmi.mjt.foodanalyzer.client.FoodAnalyzerClient.main(FoodAnalyzerClient.java:51)
 
+2026-02-16 14:55:14: Invalid command: Missing food name! Command usage get-food <food_name>
+bg.sofia.uni.fmi.mjt.foodanalyzer.exceptions.InvalidCommandException: Missing food name! Command usage get-food <food_name>
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandFactory.createGetFood(CommandFactory.java:45)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandFactory.createCommand(CommandFactory.java:30)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandExecutor.execute(CommandExecutor.java:17)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.ClientHandler.processCommand(ClientHandler.java:58)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.ClientHandler.run(ClientHandler.java:46)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+2026-02-16 14:55:51: Invalid command: Missing food name! Command usage get-food <food_name>
+bg.sofia.uni.fmi.mjt.foodanalyzer.exceptions.InvalidCommandException: Missing food name! Command usage get-food <food_name>
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandFactory.createGetFood(CommandFactory.java:45)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandFactory.createCommand(CommandFactory.java:30)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandExecutor.execute(CommandExecutor.java:17)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.ClientHandler.processCommand(ClientHandler.java:58)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.ClientHandler.run(ClientHandler.java:46)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
