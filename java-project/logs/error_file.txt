@@ -1,0 +1,72 @@
+2026-02-15 20:47:09: Invalid command: Unknown command
+bg.sofia.uni.fmi.mjt.foodanalyzer.exceptions.InvalidCommandException: Unknown command
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandFactory.createCommand(CommandFactory.java:45)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandExecutor.execute(CommandExecutor.java:17)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.ClientHandler.run(ClientHandler.java:32)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+2026-02-15 23:24:01: Invalid command: Unknown command
+bg.sofia.uni.fmi.mjt.foodanalyzer.exceptions.InvalidCommandException: Unknown command
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandFactory.createCommand(CommandFactory.java:45)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandExecutor.execute(CommandExecutor.java:17)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.ClientHandler.run(ClientHandler.java:33)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+2026-02-15 23:24:14: Invalid command: Unknown command
+bg.sofia.uni.fmi.mjt.foodanalyzer.exceptions.InvalidCommandException: Unknown command
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandFactory.createCommand(CommandFactory.java:45)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandExecutor.execute(CommandExecutor.java:17)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.ClientHandler.run(ClientHandler.java:33)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+2026-02-15 23:25:27: Invalid command: Missing command arguments
+bg.sofia.uni.fmi.mjt.foodanalyzer.exceptions.InvalidCommandException: Missing command arguments
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandFactory.createCommand(CommandFactory.java:30)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandExecutor.execute(CommandExecutor.java:17)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.ClientHandler.run(ClientHandler.java:33)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+2026-02-15 23:25:34: Invalid command: Unknown command
+bg.sofia.uni.fmi.mjt.foodanalyzer.exceptions.InvalidCommandException: Unknown command
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandFactory.createCommand(CommandFactory.java:45)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandExecutor.execute(CommandExecutor.java:17)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.ClientHandler.run(ClientHandler.java:33)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+2026-02-16 00:08:32: Invalid command: Unknown command
+bg.sofia.uni.fmi.mjt.foodanalyzer.exceptions.InvalidCommandException: Unknown command
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandFactory.createCommand(CommandFactory.java:45)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandExecutor.execute(CommandExecutor.java:17)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.ClientHandler.run(ClientHandler.java:35)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+2026-02-16 00:08:44: Invalid command: Missing command arguments
+bg.sofia.uni.fmi.mjt.foodanalyzer.exceptions.InvalidCommandException: Missing command arguments
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandFactory.createCommand(CommandFactory.java:30)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandExecutor.execute(CommandExecutor.java:17)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.ClientHandler.run(ClientHandler.java:35)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+2026-02-16 00:17:38: Invalid command: FCD ID must be a positive integer!
+bg.sofia.uni.fmi.mjt.foodanalyzer.exceptions.InvalidCommandException: FCD ID must be a positive integer!
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandFactory.createCommand(CommandFactory.java:38)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandExecutor.execute(CommandExecutor.java:17)
+	at bg.sofia.uni.fmi.mjt.foodanalyzer.server.ClientHandler.run(ClientHandler.java:35)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+

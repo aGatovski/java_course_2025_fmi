@@ -16,8 +16,11 @@ public class ClientHandler implements Runnable {
     private final CommandExecutor commandExecutor;
 
     public ClientHandler(Socket socket) {
+        if (socket == null) {
+            throw new IllegalArgumentException("Socket cannot be null!");
+        }
         this.socket = socket;
-        commandExecutor = new CommandExecutor();
+        this.commandExecutor = new CommandExecutor();
     }
 
     @Override
@@ -26,23 +29,39 @@ public class ClientHandler implements Runnable {
 
         try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-             socket) {
+             this.socket) {
 
             String command;
             while ((command = in.readLine()) != null && !command.equalsIgnoreCase("quit")) {
-                String response = "";
-                try {
-                    response = commandExecutor.execute(command);
-                } catch (InvalidCommandException e) {
-                    out.println("Invalid command!");
-                    Logger.logError("Invalid command: " + e.getMessage(), e);
+
+                if (command.isBlank()) {
+                    continue;
                 }
 
-                out.println(response);
+                if (command.equalsIgnoreCase("quit")) {
+                    out.println("END_RESPONSE");
+                    break;
+                }
+
+                //String response = "";
+                try {
+                    String response = commandExecutor.execute(command);
+                    out.println(response);
+                } catch (InvalidCommandException e) {
+                    out.println("Error: " + e.getMessage());
+                    Logger.logError("Invalid command: " + e.getMessage(), e);
+                } catch (Exception e) {
+                    Logger.logError("Error executing command from " + clientAddress, e);
+                    out.println("Unexpected error occurred. Check error logs!");
+                }
+
+                //out.println(response);
                 out.println("END_RESPONSE");
             }
         } catch (IOException e) {
             Logger.logError("Error handling client: " + clientAddress, e);
+        } catch (Exception e) {
+            Logger.logError("Unexpected error handling client " + clientAddress, e);
         }
     }
 }
