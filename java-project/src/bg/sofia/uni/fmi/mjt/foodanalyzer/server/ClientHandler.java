@@ -11,7 +11,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ClientHandler implements Runnable {
-
+    private static final String CMD_QUIT = "quit";
+    private static final String END_RESPONSE = "END_RESPONSE";
     private final Socket socket;
     private final CommandExecutor commandExecutor;
 
@@ -37,13 +38,13 @@ public class ClientHandler implements Runnable {
                     continue;
                 }
 
-                if (command.equalsIgnoreCase("quit")) {
-                    out.println("END_RESPONSE");
+                if (command.equalsIgnoreCase(CMD_QUIT)) {
+                    out.println(END_RESPONSE);
                     break;
                 }
 
                 processCommand(command, out, clientAddress);
-                out.println("END_RESPONSE");
+                out.println(END_RESPONSE);
             }
         } catch (IOException e) {
             Logger.logError("Error handling client: " + clientAddress, e);
