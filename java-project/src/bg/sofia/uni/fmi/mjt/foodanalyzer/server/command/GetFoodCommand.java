@@ -1,12 +1,13 @@
 package bg.sofia.uni.fmi.mjt.foodanalyzer.server.command;
 
 import bg.sofia.uni.fmi.mjt.foodanalyzer.exceptions.ApiException;
+import bg.sofia.uni.fmi.mjt.foodanalyzer.exceptions.CacheException;
 import bg.sofia.uni.fmi.mjt.foodanalyzer.server.api.FoodDataApiClient;
 import bg.sofia.uni.fmi.mjt.foodanalyzer.server.api.dto.SearchResult;
 import bg.sofia.uni.fmi.mjt.foodanalyzer.server.api.dto.SearchResultFood;
 import bg.sofia.uni.fmi.mjt.foodanalyzer.server.cache.CacheManager;
+import bg.sofia.uni.fmi.mjt.foodanalyzer.server.logger.Logger;
 import com.google.gson.Gson;
-
 import java.util.Optional;
 
 public class GetFoodCommand implements Command {
@@ -34,9 +35,12 @@ public class GetFoodCommand implements Command {
                 cacheManager.cacheFood(foodName, jsonToSave);
             }
 
+            cacheBarcodeFromResponse(response);
+
             return formatSearchResult(response);
         } catch (ApiException e) {
-            throw new RuntimeException(e);
+            Logger.logError("API error during food search", e);
+            return "Failed to ";
         }
     }
 
@@ -64,5 +68,19 @@ public class GetFoodCommand implements Command {
         }
 
         return sb.toString().trim();
+    }
+
+    private void cacheBarcodeFromResponse(SearchResult response) {
+        if (response.foods() != null) {
+            for (SearchResultFood food : response.foods()) {
+                if (food.gtinUpc() != null && !food.gtinUpc().isBlank()) {
+                    try {
+                        cacheManager.cacheBarcode(food.gtinUpc(), food.fdcId());
+                    } catch (CacheException e) {
+                        Logger.logError("Failed to cache barcode mapping: " + e.getMessage(), e);
+                    }
+                }
+            }
+        }
     }
 }

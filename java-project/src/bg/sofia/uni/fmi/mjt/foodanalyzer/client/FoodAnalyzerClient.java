@@ -14,10 +14,14 @@ public class FoodAnalyzerClient {
     private static String handleResponse(BufferedReader reader) throws IOException {
         StringBuilder response = new StringBuilder();
         String line;
-
-        while ((line = reader.readLine()) != null) { // read the message from the client
-            response.append("\n").append(line);
+        //Without end response it is waiting forever I do not know other way to fix this...
+        while ((line = reader.readLine()) != null) {
+            if (line.equalsIgnoreCase("END_RESPONSE")) {
+                break;
+            }
+            response.append(line).append("\n");
         }
+
         return response.toString();
     }
 

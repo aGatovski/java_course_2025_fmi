@@ -1,6 +1,8 @@
 package bg.sofia.uni.fmi.mjt.foodanalyzer.server;
 
+import bg.sofia.uni.fmi.mjt.foodanalyzer.exceptions.InvalidCommandException;
 import bg.sofia.uni.fmi.mjt.foodanalyzer.server.command.CommandExecutor;
+import bg.sofia.uni.fmi.mjt.foodanalyzer.server.logger.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,19 +22,27 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
+        String clientAddress = socket.getRemoteSocketAddress().toString();
+
         try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              socket) {
 
             String command;
-            command = in.readLine(); // read the message from the client
+            while ((command = in.readLine()) != null && !command.equalsIgnoreCase("quit")) {
+                String response = "";
+                try {
+                    response = commandExecutor.execute(command);
+                } catch (InvalidCommandException e) {
+                    out.println("Invalid command!");
+                    Logger.logError("Invalid command: " + e.getMessage(), e);
+                }
 
-            String response = commandExecutor.execute(command); // commandExecutor kazva koq komanda
-
-            out.println(response); // send response back to the client/Server
-
+                out.println(response);
+                out.println("END_RESPONSE");
+            }
         } catch (IOException e) {
-            throw new RuntimeException(e); //logger
+            Logger.logError("Error handling client: " + clientAddress, e);
         }
     }
 }

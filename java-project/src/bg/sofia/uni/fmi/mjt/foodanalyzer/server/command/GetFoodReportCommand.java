@@ -31,7 +31,8 @@ public class GetFoodReportCommand implements Command {
                 //cache to return the objects?
             } else {
                 response = apiClient.getFoodReport(foodFdcId);
-                //potentially cache the barcode if it exist would be nice
+                String jsonToSave = GSON.toJson(response);
+                cacheManager.cacheReport(foodFdcId, jsonToSave);
             }
 
             return formatSearchResultFood(response);
@@ -48,13 +49,19 @@ public class GetFoodReportCommand implements Command {
         sb.append(String.format("Ingredients: %s\n", response.ingredients()));
 
         for (AbridgedFoodNutrient nutrient : response.foodNutrients()) {
+            addNutrientIfPresent(sb, nutrient);
+        }
+
+        return sb.toString().trim();
+    }
+
+    private void addNutrientIfPresent(StringBuilder sb, AbridgedFoodNutrient nutrient) {
+        if (nutrient.nutrientName() != null) {
             sb.append(String.format("Nutrient ID: %d\n", nutrient.nutrientId()));
             sb.append(String.format("Nutrient Name: %s\n", nutrient.nutrientName()));
             sb.append(String.format("Unit Name: %s\n", nutrient.unitName()));
             sb.append(String.format("Value: %s\n", nutrient.value()));
             sb.append("\n");
         }
-
-        return sb.toString().trim();
     }
 }

@@ -1,5 +1,7 @@
 package bg.sofia.uni.fmi.mjt.foodanalyzer.server;
 
+import bg.sofia.uni.fmi.mjt.foodanalyzer.server.logger.Logger;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -37,13 +39,12 @@ public class FoodAnalyzerServer {
                 executorService.execute(clientHandler);
             }
         } catch (IOException e) {
-            throw new RuntimeException("There is a problem with the server socket", e);
+            Logger.logError("Failed to start server", e);
         }
     }
 
     static void main() {
         FoodAnalyzerServer server = new FoodAnalyzerServer();
-
         server.start();
     }
 }

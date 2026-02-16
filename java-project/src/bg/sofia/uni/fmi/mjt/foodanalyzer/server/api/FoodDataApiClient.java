@@ -17,6 +17,11 @@ import java.nio.charset.StandardCharsets;
 public class FoodDataApiClient {
     private static final String BASE_URL = "https://api.nal.usda.gov/fdc/v1";
     private static final String API_KEY = "umcMWkUywbqeSoZvilgc5aTVgI0xjceUZypaEVJV";
+    private static final int HTTP_OK = 200;
+    private static final int HTTP_UNAUTHORIZED = 401;
+    private static final int HTTP_NOT_FOUND = 404;
+    private static final int HTTP_TOO_MANY_REQUESTS = 429;
+    private static final int HTTP_SERVER_ERROR = 500;
 
     private static final Gson GSON = new Gson();
     private final HttpClient httpClient;
@@ -57,13 +62,27 @@ public class FoodDataApiClient {
 
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.body();
+            int statusCode = response.statusCode();
+
+            if (statusCode == HTTP_OK) {
+                return response.body();
+            } else if (statusCode == HTTP_UNAUTHORIZED) {
+                throw new ApiException("Unauthorized: Invalid API key");
+            } else if (statusCode == HTTP_TOO_MANY_REQUESTS) {
+                throw new ApiException("Rate limit exceeded. Please try again later.");
+            } else if (statusCode == HTTP_NOT_FOUND) {
+                throw new ApiException("Food not found");
+            } else if (statusCode >= HTTP_SERVER_ERROR) {
+                throw new ApiException("API server error");
+            } else {
+                throw new ApiException("API request failed with status: " + statusCode);
+            }
         } catch (IOException e) {
-            throw new ApiException("I/O error occurred when sending query or the client has shut down!");
+            throw new ApiException("Network connectivity issue or timeout.", e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            //throw new IOException("Request interrupted", e);
-            throw new ApiException("Query operation was interrupted!");
+            throw new ApiException("Request was interrupted.", e);
         }
     }
 }
+//FINITO TEST IT

@@ -1,10 +1,9 @@
 package bg.sofia.uni.fmi.mjt.foodanalyzer.server.cache;
 
 import bg.sofia.uni.fmi.mjt.foodanalyzer.exceptions.CacheException;
+import bg.sofia.uni.fmi.mjt.foodanalyzer.server.logger.Logger;
 
 import java.io.IOException;
-import java.nio.file.DirectoryIteratorException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,21 +11,17 @@ import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 
 public class CacheManager {
-    private static final String CACHE_DIR = "cache";
     private static final String CACHE_DIR_FOOD = "cache/food";
     private static final String CACHE_DIR_BARCODE = "cache/barcodes";
     private static final String CACHE_DIR_FOOD_REPORT = "cache/report";
 
-    private final Path cacheDir;
     private final Path foodDir;
     private final Path reportDir;
     private final Path barcodeDir;
 
     private static final CacheManager INSTANCE = new CacheManager();
 
-    //Converts a path string, or a sequence of strings that when joined form a path string, to a Path.
     private CacheManager() {
-        this.cacheDir = Paths.get(CACHE_DIR);
         this.foodDir = Paths.get(CACHE_DIR_FOOD);
         this.reportDir = Paths.get(CACHE_DIR_FOOD_REPORT);
         this.barcodeDir = Paths.get(CACHE_DIR_BARCODE);
@@ -40,12 +35,11 @@ public class CacheManager {
 
     private void initDirectories() {
         try {
-            //System.out.println("DEBUG: Creating folders at: " + foodDir.toAbsolutePath());
             Files.createDirectories(foodDir);
             Files.createDirectories(reportDir);
             Files.createDirectories(barcodeDir);
         } catch (IOException e) {
-            throw new CacheException("Failed to initialise directories", e); // adni go v loggera za greshki
+            throw new CacheException("Failed to initialise cache directories", e);
         }
     }
 
@@ -64,7 +58,6 @@ public class CacheManager {
         writeToCache(filePath, String.valueOf(fdcId));
     }
 
-    //vuv failowata sistema sa code.txt Ako e img purvo dekodirame do barcode posle go vzimame i s nego tursim
     public synchronized Optional<Integer> getFdcIdByBarcode(String barcode) throws CacheException {
         Path filePath = barcodeDir.resolve(barcode + ".txt");
         Optional<String> fileContent = readFromCache(filePath);
@@ -86,7 +79,7 @@ public class CacheManager {
         try {
             Files.writeString(filePath, jsonData, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
-            throw new CacheException("Failed to write to cache: " + filePath, e);
+            throw new CacheException("Failed to write to cache: " + filePath, e); //tova e smurtna greshka
         }
     }
 
@@ -99,25 +92,8 @@ public class CacheManager {
             String json = Files.readString(filePath);
             return Optional.of(json);
         } catch (IOException e) {
-            throw new CacheException("Failed to read from cache: " + filePath);
-        }
-    }
-
-    public void clearCache() {
-        clearDir(foodDir);
-        clearDir(reportDir);
-        clearDir(barcodeDir);
-    }
-
-    private void clearDir(Path dir) {
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
-
-            for (Path fileInDir : stream) {
-                Files.delete(fileInDir);
-            }
-
-        } catch (IOException | DirectoryIteratorException e) {
-            throw new CacheException("Failed to clear cache");
+            Logger.logError("Failed to read from cache: " + filePath, e); //tova e nesh s koeto moga da jiveq
+            return Optional.empty();
         }
     }
 }
