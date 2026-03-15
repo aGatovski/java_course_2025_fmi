@@ -79,7 +79,7 @@ public class CacheManager {
         try {
             Files.writeString(filePath, jsonData, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
-            throw new CacheException("Failed to write to cache: " + filePath, e); //tova e smurtna greshka
+            throw new CacheException("Failed to write to cache: " + filePath, e);
         }
     }
 
@@ -92,7 +92,7 @@ public class CacheManager {
             String json = Files.readString(filePath);
             return Optional.of(json);
         } catch (IOException e) {
-            Logger.logError("Failed to read from cache: " + filePath, e); //tova e nesh s koeto moga da jiveq
+            Logger.logError("Failed to read from cache: " + filePath, e);
             return Optional.empty();
         }
     }

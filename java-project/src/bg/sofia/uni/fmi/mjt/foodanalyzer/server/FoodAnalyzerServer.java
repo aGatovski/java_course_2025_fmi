@@ -8,6 +8,13 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/*
+* Имаме ThreadPool който е дефиниран в try-with-resources тъй като Executor-ите имплементират AutoClose
+* тоест автоматично им се вика метода close ot JVM
+* close-a na Executorite вика shutdown на ThreadPool-a , не го загася веднага чака да се изпълнят вс наредени задачи
+* но не му позволява да приема нови
+*
+* */
 public class FoodAnalyzerServer {
     private static final int MAX_EXECUTOR_THREADS = 10;
     private static final int SERVER_PORT = 8080;

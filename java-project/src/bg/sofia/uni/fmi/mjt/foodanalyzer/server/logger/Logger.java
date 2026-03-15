@@ -1,6 +1,5 @@
 package bg.sofia.uni.fmi.mjt.foodanalyzer.server.logger;
 
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
