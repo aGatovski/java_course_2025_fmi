@@ -62,7 +62,6 @@ public enum Country {
         this.code = code;
     }
 
-    //tui mai e nenujno moe go mahna
     public String getCode() {
         return code;
     }

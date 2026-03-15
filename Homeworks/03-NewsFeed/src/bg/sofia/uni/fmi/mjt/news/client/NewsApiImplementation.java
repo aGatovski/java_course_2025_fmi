@@ -16,7 +16,12 @@ public class NewsApiImplementation {
             throw new ApiKeyException("Api key is required!");
         }
 
-        this.httpClient = new NewsHttpClient(apiKey);
+        this.httpClient = new NewsHttpClientImpl(apiKey);
+        this.cacheResponseMap = new HashMap<>();
+    }
+
+    NewsApiImplementation(NewsHttpClient httpClient) {
+        this.httpClient = httpClient;
         this.cacheResponseMap = new HashMap<>();
     }
 

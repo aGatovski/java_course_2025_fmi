@@ -25,6 +25,9 @@
       <sourceFolder url="file://$MODULE_DIR$/Labs/08/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/Homeworks/02-SpaceScanner/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Homeworks/02-SpaceScanner/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/Homeworks/03-NewsFeed/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Homeworks/03-NewsFeed/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/Spotify/src" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -45,5 +48,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="google.code.gson" level="project" />
   </component>
 </module>

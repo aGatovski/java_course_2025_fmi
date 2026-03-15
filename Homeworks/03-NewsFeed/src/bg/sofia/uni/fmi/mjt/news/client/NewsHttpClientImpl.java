@@ -19,18 +19,25 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
-public class NewsHttpClient {
+public class NewsHttpClientImpl implements NewsHttpClient {
     private static final String BASE_URL = "https://newsapi.org/v2/top-headlines?";
     private static final String API_KEY_HEADER = "X-Api-Key";
 
     private final String apiKey;
     private static final Gson GSON = new Gson();
-    private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
+    private final HttpClient httpClient;
 
-    public NewsHttpClient(String apiKey) {
+    public NewsHttpClientImpl(String apiKey) {
         this.apiKey = apiKey;
+        httpClient = HttpClient.newHttpClient();
     }
 
+    NewsHttpClientImpl(String apiKey, HttpClient httpClient) {
+        this.apiKey = apiKey;
+        this.httpClient = httpClient;
+    }
+
+    @Override
     public NewsSuccessResponse sendRequest(NewsQuery query) throws NewsApiException {
         String url = buildURL(query);
 
@@ -38,7 +45,7 @@ public class NewsHttpClient {
             HttpRequest.newBuilder().uri(URI.create(url)).header(API_KEY_HEADER, apiKey).GET().build();
 
         try {
-            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return handleResponse(response);
         } catch (IOException e) {
             throw new NewsApiException("I/O error occurred when sending query or the client has shut down!");
@@ -50,7 +57,6 @@ public class NewsHttpClient {
     private String buildURL(NewsQuery query) {
         StringBuilder queryString = new StringBuilder(BASE_URL);
 
-        //Encode the spaces and special chars
         String encodedKeywords = URLEncoder.encode(query.getKeywords(), StandardCharsets.UTF_8);
         queryString.append("q=").append(encodedKeywords);
 

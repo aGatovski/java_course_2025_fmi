@@ -3,7 +3,6 @@ package bg.sofia.uni.fmi.mjt.news.query;
 import java.util.Objects;
 
 public class NewsQuery {
-    //mendatory
     private final String keywords;
     private final Category category;
     private final Country country;
@@ -50,8 +49,8 @@ public class NewsQuery {
 
         NewsQuery newsQuery = (NewsQuery) obj;
 
-        return keywords.equals(newsQuery.keywords) && category == newsQuery.category && country == newsQuery.country &&
-            page == newsQuery.page && pageSize == newsQuery.pageSize;
+        return Objects.equals(keywords, newsQuery.keywords) && category == newsQuery.category &&
+            country == newsQuery.country && page == newsQuery.page && pageSize == newsQuery.pageSize;
     }
 
     @Override
